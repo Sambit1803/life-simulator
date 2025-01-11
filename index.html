@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Simulator Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+    <div id="start-screen">
+        <h1>Life Simulator</h1>
+        <button id="new-game">New Game</button>
+        <button id="continue-game">Continue</button>
+        <button id="reset-game">Reset</button>
+    </div>
+
+    <div id="game-screen" style="display: none;">
+        <header>
+            <h1>Life Simulator</h1>
+            <p>Age: <span id="age">18</span></p>
+            <p>Days Advanced: <span id="days-advanced">0</span></p>
+            <p>Remaining Days: <span id="remaining-days">547</span> (1.5 years)</p>
+            <p>Money in Hand: ₹<span id="money">0</span></p>
+            <p>Bank Balance: ₹<span id="bank-balance">0</span></p>
+            <p>Daily Expenses: ₹<span id="daily-expenses">3</span> <span id="info-expenses">(Food only)</span></p>
+            <div id="action-message" style="color: green; display: none;"></div>
+        </header>
+
+        <nav>
+            <button class="tab-button" data-tab="home">Home</button>
+            <button class="tab-button" data-tab="education">Education</button>
+            <button class="tab-button" data-tab="career">Career</button>
+            <button class="tab-button" data-tab="lifestyle">Lifestyle</button>
+        </nav>
+
+        <!-- Home Tab -->
+        <section id="home-tab" class="tab-content">
+            <h2>Home</h2>
+            <div class="option">
+                <strong>Beggar</strong>
+                <p>Generate random coins (1-50) based on probability.</p>
+                <button class="action-button" id="beggar-button">+ Start</button>
+            </div>
+            <div class="option">
+                <strong>Thief</strong>
+                <p>High risk, high reward (70% jail, 30% ₹500).</p>
+                <button class="action-button" id="thief-button">+ Steal</button>
+            </div>
+            <div class="option">
+                <strong>Delivery Guy</strong>
+                <p>Earn income with a bicycle.</p>
+                <button class="action-button" id="delivery-button" disabled>+ Work</button>
+            </div>
+            <div class="option">
+                <strong>Road Art Show</strong>
+                <p>Earn income with an instrument.</p>
+                <button class="action-button" id="art-show-button" disabled>+ Perform</button>
+            </div>
+            <div class="option">
+                <strong>Errands</strong>
+                <p>Earn income with a bike.</p>
+                <button class="action-button" id="errands-button" disabled>+ Do Errands</button>
+            </div>
+            <button id="skip-day">Skip Day</button>
+        </section>
+
+        <!-- Education Tab -->
+        <section id="education-tab" class="tab-content">
+            <h2>Education</h2>
+            <div class="option">
+                <strong>Basic Test</strong>
+                <p>Requires ₹1500. Adds 6 months to remaining life.</p>
+                <button class="action-button" id="basic-test-button">+ Take Test</button>
+            </div>
+            <div class="option">
+                <strong>Bachelor Degree</strong>
+                <p>Requires ₹40,000 and Basic Test. Adds 36 months to remaining life.</p>
+                <button class="action-button" id="bachelor-degree-button" disabled>+ Enroll</button>
+            </div>
+            <div class="option">
+                <strong>Masters Degree</strong>
+                <p>Requires ₹60,000 and Bachelor Degree. Adds 48 months to remaining life.</p>
+                <button class="action-button" id="masters-degree-button" disabled>+ Enroll</button>
+            </div>
+            <div class="option">
+                <strong>PhD</strong>
+                <p>Requires ₹70,000 and Masters Degree. Adds 60 months to remaining life.</p>
+                <button class="action-button" id="phd-button" disabled>+ Enroll</button>
+            </div>
+        </section>
+
+        <!-- Career Tab -->
+        <section id="career-tab" class="tab-content">
+            <h2>Career</h2>
+            <div class="option">
+                <strong>Software Developer L1</strong>
+                <p>Generates ₹800/day. Requires Bachelor Degree.</p>
+                <button class="action-button" id="dev-l1-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Primary Teacher</strong>
+                <p>Generates ₹700/day. Requires Bachelor Degree.</p>
+                <button class="action-button" id="teacher-primary-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Software Developer L2</strong>
+                <p>Generates ₹1500/day. Requires Software Developer L1 for 12 months.</p>
+                <button class="action-button" id="dev-l2-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Secondary Teacher</strong>
+                <p>Generates ₹1400/day. Requires Primary Teacher for 6 months.</p>
+                <button class="action-button" id="teacher-secondary-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Professor</strong>
+                <p>Generates ₹4000/day. Requires Secondary Teacher for 18 months and PhD.</p>
+                <button class="action-button" id="professor-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Specialist Developer</strong>
+                <p>Generates ₹2000/day. Requires Software Developer L2 for 24 months.</p>
+                <button class="action-button" id="specialist-dev-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Team Lead</strong>
+                <p>Generates ₹3500/day. Requires Specialist Developer for 36 months.</p>
+                <button class="action-button" id="team-lead-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Manager</strong>
+                <p>Generates ₹5000/day. Requires Team Lead for 36 months and Masters Degree.</p>
+                <button class="action-button" id="manager-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Entrepreneur</strong>
+                <p>Generates ₹8000/day. Requires Manager or Professor for 48 months.</p>
+                <button class="action-button" id="entrepreneur-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Super Entrepreneur</strong>
+                <p>Generates ₹12,000/day. Requires Entrepreneur for 48 months.</p>
+                <button class="action-button" id="super-entrepreneur-button" disabled>+ Apply</button>
+            </div>
+            <div class="option">
+                <strong>Investor</strong>
+                <p>Generates ₹20,000/day. Requires Super Entrepreneur for 48 months.</p>
+                <button class="action-button" id="investor-button" disabled>+ Apply</button>
+            </div>
+        </section>
+
+        <!-- Lifestyle Tab -->
+        <section id="lifestyle-tab" class="tab-content">
+            <h2>Lifestyle</h2>
+            <h3>Rent House</h3>
+            <div class="option">
+                <strong>PG</strong>
+                <p>Adds 3 months to remaining life. ₹100/day.</p>
+                <button class="action-button" id="pg-button">+ Rent</button>
+            </div>
+            <div class="option">
+                <strong>2BHK</strong>
+                <p>Adds 6 months to remaining life. ₹150/day.</p>
+                <button class="action-button" id="rent-2bhk-button" disabled>+ Rent</button>
+            </div>
+            <div class="option">
+                <strong>3BHK</strong>
+                <p>Adds 12 months to remaining life. ₹250/day.</p>
+                <button class="action-button" id="rent-3bhk-button" disabled>+ Rent</button>
+            </div>
+
+            <h3>Buy Home</h3>
+            <div class="option">
+                <strong>2BHK</strong>
+                <p>Adds 24 months to remaining life. ₹10,000 one-time cost.</p>
+                <button class="action-button" id="buy-2bhk-button">+ Buy</button>
+            </div>
+            <div class="option">
+                <strong>3BHK</strong>
+                <p>Adds 36 months to remaining life. ₹20,000 one-time cost.</p>
+                <button class="action-button" id="buy-3bhk-button" disabled>+ Buy</button>
+            </div>
+            <div class="option">
+                <strong>Duplex</strong>
+                <p>Adds 48 months to remaining life. ₹40,000 one-time cost.</p>
+                <button class="action-button" id="buy-duplex-button" disabled>+ Buy</button>
+            </div>
+            <div class="option">
+                <strong>Bungalow</strong>
+                <p>Adds 60 months to remaining life. ₹80,000 one-time cost.</p>
+                <button class="action-button" id="buy-bungalow-button" disabled>+ Buy</button>
+            </div>
+
+            <h3>Items</h3>
+            <div class="option">
+                <strong>Bicycle</strong>
+                <p>Adds 1 month to remaining life. ₹200 one-time cost.</p>
+                <button class="action-button" id="bicycle-button">+ Buy</button>
+            </div>
+            <div class="option">
+                <strong>Instrument</strong>
+                <p>Adds 2 months to remaining life. ₹300 one-time cost.</p>
+                <button class="action-button" id="instrument-button">+ Buy</button>
+            </div>
+            <div class="option">
+                <strong>Bike</strong>
+                <p>Adds 3 months to remaining life. ₹600 one-time cost.</p>
+                <button class="action-button" id="bike-button">+ Buy</button>
+            </div>
+
+            <h3>Food</h3>
+            <div class="option">
+                <strong>Basic</strong>
+                <p>Adds 3 months to remaining life. ₹5/day.</p>
+                <button class="action-button" id="food-basic-button">+ Switch</button>
+            </div>
+            <div class="option">
+                <strong>Balanced</strong>
+                <p>Adds 6 months to remaining life. ₹25/day.</p>
+                <button class="action-button" id="food-balanced-button" disabled>+ Switch</button>
+            </div>
+            <div class="option">
+                <strong>Diet</strong>
+                <p>Adds 12 months to remaining life. ₹50/day.</p>
+                <button class="action-button" id="food-diet-button" disabled>+ Switch</button>
+            </div>
+
+            <h3>Health</h3>
+            <div class="option">
+                <strong>Basic Checkup</strong>
+                <p>Adds 3 months to remaining life. ₹100 one-time cost.</p>
+                <button class="action-button" id="checkup-basic-button">+ Take</button>
+            </div>
+            <div class="option">
+                <strong>Full Body Checkup</strong>
+                <p>Adds 6 months to remaining life. ₹250 one-time cost.</p>
+                <button class="action-button" id="checkup-full-body-button">+ Take</button>
+            </div>
+        </section>
+    </div>
+</div>
+<script src="script.js"></script>
+</body>
+</html>
+
