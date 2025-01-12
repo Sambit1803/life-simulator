@@ -131,12 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const messageDiv = document.getElementById('action-message');
         messageDiv.textContent = message;
         messageDiv.style.color = color;
-        messageDiv.style.display = 'block';
-
-        // Hide the message after 3 seconds
-        setTimeout(() => {
-            messageDiv.style.display = 'none';
-        }, 3000);
+        messageDiv.style.visibility = 'visible';
     };
 
     // Probability helper function
@@ -157,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (playerState.isInJail) {
             if (--playerState.jailDays <= 0) {
                 playerState.isInJail = false;
+                alert(`Jail period is over`)
             }
         } else {
             playerState.money -= playerState.dailyExpenses;
@@ -214,11 +210,11 @@ document.addEventListener('DOMContentLoaded', () => {
             playerState.jailDays = 30;
             alert("You got caught and are now in jail for 30 days!");
         } else if (jailChance > 40 && jailChance <= 80){
-            alert("No luck!");
+            showMessage("No luck!", "red");
             advanceDay();
         } else {
             playerState.money += 800;
-            alert("You successfully stole ₹800!");
+            showMessage(`You successfully stole ₹800!`);
             advanceDay();
         }
         updateUI();
@@ -241,7 +237,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerState.money += baseIncome * 5;
         advanceDay();
         updateUI();
-        alert(`You earned ₹${baseIncome * 5} as a delivery guy!`);
+        showMessage(`You earned ₹${baseIncome * 5} as a delivery guy!`);
     });
 
     document.getElementById('art-show-button').addEventListener('click', () => {
@@ -261,7 +257,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerState.money += baseIncome * 7;
         advanceDay();
         updateUI();
-        alert(`You earned ₹${baseIncome * 7} from your art show!`);
+        showMessage(`You earned ₹${baseIncome * 7} from your art show!`);
     });
 
     document.getElementById('errands-button').addEventListener('click', () => {
@@ -281,7 +277,7 @@ document.addEventListener('DOMContentLoaded', () => {
         playerState.money += baseIncome * 10;
         advanceDay();
         updateUI();
-        alert(`You earned ₹${baseIncome * 10} from doing errands!`);
+        showMessage(`You earned ₹${baseIncome * 10} from doing errands!`);
     });
 
     // Education tab logic
