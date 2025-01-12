@@ -52,6 +52,17 @@ button {
     margin: 1vh;
 }
 
+#menu-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#menu-panel button{
+    margin: 0.25vh;
+}
+
 .tab-content {
     display: none;
 }

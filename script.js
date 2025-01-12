@@ -13,7 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Player state
     let playerState = {
-        started: false,
+        savedGame: false,
         age: 18,
         daysAdvanced:0,
         remainingDays: 540, // 1.5 years in days
@@ -48,17 +48,30 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     document.getElementById('new-game').addEventListener('click', () => {
-        playerState.started = true;
-        startScreen.style.display = 'none';
-        gameScreen.style.display = 'block';
-        saveGame();
-        updateUI();
+        const savedData = JSON.parse(localStorage.getItem('lifeSimulatorData'));
+        if (!savedData.savedGame) {
+            // No saved game, start a new game
+            playerState.savedGame = true;
+            startScreen.style.display = 'none';
+            gameScreen.style.display = 'block';
+            saveGame();
+            updateUI();
+        } else {
+            // Prompt user if a saved game already exists
+            if (confirm("You have a saved game. Do you still want to start a new game?")) {
+                playerState.savedGame = true; // Start a new game
+                startScreen.style.display = 'none';
+                gameScreen.style.display = 'block';
+                saveGame();
+                updateUI();
+            }
+        }
     });
 
     document.getElementById('continue-game').addEventListener('click', () => {
         loadGame();
-        if(!playerState.started) {
-            alert("You do not have any game saved. Start a new game!");
+        if(!playerState.savedGame) {
+            alert("You have no games saved. Start a new game!");
             return;
         }
         startScreen.style.display = 'none';
@@ -69,6 +82,10 @@ document.addEventListener('DOMContentLoaded', () => {
         if(confirm("Do you want to reset the game?")){
             resetGame();
         }
+    });
+
+    document.getElementById('back-to-menu').addEventListener('click', () => {
+        location.reload();
     });
 
     const eduTabLoad = () => {
