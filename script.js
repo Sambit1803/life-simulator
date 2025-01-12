@@ -15,20 +15,18 @@ document.addEventListener('DOMContentLoaded', () => {
     let playerState = {
         age: 18,
         daysAdvanced:0,
-        remainingDays: 547, // 1.5 years in days
-        money: 50000000,
+        remainingDays: 540, // 1.5 years in days
+        money: 0,
         bankBalance: 0,
         dailyExpenses: 3,
         isInJail: false,
         activeJob: null,
-        education: null,
-    };
-
-    let education = {
-        hasBasicTest: false,
-        hasBachelorDegree: false,
-        hasMastersDegree: false,
-        hasPhD: false
+        education: {
+            hasBasicTest: false,
+            hasBachelorDegree: false,
+            hasMastersDegree: false,
+            hasPhD: false
+        },
     };
 
     const loadGame = () => {
@@ -62,13 +60,26 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const eduTabLoad = () => {
-        if(education.hasBasicTest){
-             document.getElementById('basic-test-button').style.display = 'none';
-             playerState.education = education;
+        // Check if the basic test has been purchased
+        if (playerState.education.hasBasicTest) {
+            const btn = document.getElementById('basic-test-button');
+            btn.style.display = 'none';
+            btn.parentElement.style.color = "green";
         }
-        if(education.hasBachelorDegree){
-             document.getElementById('bachelor-degree-button').style.display = 'none';
-             playerState.education = education;
+        if (playerState.education.hasBachelorDegree) {
+            const btn = document.getElementById('bachelor-degree-button');
+            btn.style.display = 'none';
+            btn.parentElement.style.color = "green";
+        }
+        if (playerState.education.hasMastersDegree) {
+            const btn = document.getElementById('masters-degree-button');
+            btn.style.display = 'none';
+            btn.parentElement.style.color = "green";
+        }
+        if (playerState.education.hasPhD) {
+            const btn = document.getElementById('phd-button');
+            btn.style.display = 'none';
+            btn.parentElement.style.color = "green";
         }
     };
 
@@ -278,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (playerState.money >= 1500) {
             playerState.money -= 1500;
             playerState.remainingDays += 180; // 6 months
-            education.hasBasicTest = true;
+            playerState.education.hasBasicTest = true;
             updateUI();
             alert('You passed the Basic Test!');
         } else {
@@ -290,8 +301,8 @@ document.addEventListener('DOMContentLoaded', () => {
         if (playerState.education.hasBasicTest) {
             if(playerState.money >= 40000) {
                 playerState.money -= 40000;
-                playerState.remainingDays += 1095; // 36 months
-                education.hasBachelorDegree = true;
+                playerState.remainingDays += 1080; // 36 months
+                playerState.education.hasBachelorDegree = true;
                 updateUI();
                 alert('You earned a Bachelor Degree!');
             } else {
@@ -302,7 +313,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Similar logic for Masters Degree and PhD
+    document.getElementById('masters-degree-button').addEventListener('click', () => {
+        if (playerState.education.hasBachelorDegree) {
+            if(playerState.money >= 60000) {
+                playerState.money -= 60000;
+                playerState.remainingDays += 1440; // 48 months
+                playerState.education.hasMastersDegree = true;
+                updateUI();
+                alert('You earned a Master Degree!');
+            } else {
+                alert('Not enough money to get a Master Degree.');
+            }
+        } else {
+            alert('You need the Bachelor Degree to get a Master Degree.');
+        }
+    });
+
+    document.getElementById('phd-button').addEventListener('click', () => {
+        if (playerState.education.hasMastersDegree) {
+            if(playerState.money >= 70000) {
+                playerState.money -= 70000;
+                playerState.remainingDays += 1800; // 60 months
+                playerState.education.hasPhD = true;
+                updateUI();
+                alert('You earned a PhD!');
+            } else {
+                alert('Not enough money to get a PhD.');
+            }
+        } else {
+            alert('You need the Master Degree to get a PhD.');
+        }
+    });
+
     // Career tab and Lifestyle tab logic can be implemented similarly...
 });
 
