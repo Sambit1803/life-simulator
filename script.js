@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Player state
     let playerState = {
+        started: false,
         age: 18,
         daysAdvanced:0,
         remainingDays: 540, // 1.5 years in days
@@ -47,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     document.getElementById('new-game').addEventListener('click', () => {
+        playerState.started = true;
         startScreen.style.display = 'none';
         gameScreen.style.display = 'block';
         saveGame();
@@ -55,8 +57,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('continue-game').addEventListener('click', () => {
         loadGame();
+        if(!playerState.started) {
+            alert("You do not have any game saved. Start a new game!");
+            return;
+        }
         startScreen.style.display = 'none';
         gameScreen.style.display = 'block';
+    });
+
+    document.getElementById('reset-game').addEventListener('click', () => {
+        if(confirm("Do you want to reset the game?")){
+            resetGame();
+        }
     });
 
     const eduTabLoad = () => {
