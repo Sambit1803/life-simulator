@@ -49,14 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('new-game').addEventListener('click', () => {
         const savedData = JSON.parse(localStorage.getItem('lifeSimulatorData'));
-        if (!savedData.savedGame) {
+        if (savedData != null && !savedData.savedGame) {
             // No saved game, start a new game
             playerState.savedGame = true;
             startScreen.style.display = 'none';
             gameScreen.style.display = 'block';
             saveGame();
             updateUI();
-        } else {
+        } else if(savedData != null && savedData.savedGame){
             // Prompt user if a saved game already exists
             if (confirm("You have a saved game. Do you still want to start a new game?")) {
                 playerState.savedGame = true; // Start a new game
@@ -65,6 +65,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 saveGame();
                 updateUI();
             }
+        } else {
+                playerState.savedGame = true; // Start a new game
+                startScreen.style.display = 'none';
+                gameScreen.style.display = 'block';
+                saveGame();
+                updateUI();
         }
     });
 
