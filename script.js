@@ -4,24 +4,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const tabContents = document.querySelectorAll('.tab-content');
     const startScreen = document.getElementById('start-screen');
     const gameScreen = document.getElementById('game-screen');
-    const ageConst = document.getElementById('age').textContent;
-    const daysAdvancedConst = document.getElementById('days-advanced').textContent;
-    const remainingDaysConst = document.getElementById('remaining-days').textContent;
-    const moneyConst = document.getElementById('money').textContent;
-    const bankBalanceConst = document.getElementById('bank-balance').textContent;
-    const dailyExpensesConst = document.getElementById('daily-expenses').textContent;
 
     // Player state
     let playerState = {
         savedGame: false,
         age: 18,
         daysAdvanced:0,
-        remainingDays: 540, // 1.5 years in days
-        money: 0,
-        bankBalance: 0,
+        remainingDays: 540,
+        totalMoney: {
+            wallet: 0,
+            bank: 0
+        },
         dailyExpenses: {
-            food: 3,
-            rent: 0
+            food: 3
         },
         isInJail: false,
         education: {
@@ -138,6 +133,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return Object.values(playerState.dailyExpenses).reduce((sum, expense) => sum + expense, 0);
     };
 
+    const calcTotalMoney = () => {
+        return Object.values(playerState.totalMoney).reduce((sum, expense) => sum + expense, 0);
+    };
+
     const rentSectionLoad = () => {
         const btn = document.getElementById(playerState.rent);
         if(btn){
@@ -174,19 +173,52 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const tooltipUpdate = () => {
+        // Expense tooltip
+        const tooltipContainer = document.getElementById('tooltip-expenses');
+        tooltipContainer.innerHTML = '';
+
+        for(let key in playerState.dailyExpenses){
+            const val = playerState.dailyExpenses[key];
+            const node = document.createElement("span");
+            const text = document.createTextNode(key+": "+val);
+            node.appendChild(text);
+            tooltipContainer.appendChild(node);
+
+            const lineBreak = document.createElement("br");
+            tooltipContainer.appendChild(lineBreak);
+        }
+
+        // Money tooltip
+        const tooltipMoneyContainer = document.getElementById('tooltip-money');
+        tooltipMoneyContainer.innerHTML = '';
+
+        for(let key in playerState.totalMoney){
+            const val = playerState.totalMoney[key];
+            const node = document.createElement("span");
+            const text = document.createTextNode(key+": "+val);
+            node.appendChild(text);
+            tooltipMoneyContainer.appendChild(node);
+
+            const lineBreak = document.createElement("br");
+            tooltipMoneyContainer.appendChild(lineBreak);
+        }
+    };
+
     // Utility functions
     const updateUI = () => {
         document.getElementById('age').textContent = playerState.age;
         document.getElementById('days-advanced').textContent = playerState.daysAdvanced;
         document.getElementById('remaining-days').textContent = playerState.remainingDays;
-        document.getElementById('money').textContent = playerState.money;
-        document.getElementById('bank-balance').textContent = playerState.bankBalance;
+        document.getElementById('total-money').textContent = calcTotalMoney();
         document.getElementById('daily-expenses').textContent = calcTotalExpense();
+        document.getElementById('wallet').textContent = playerState.totalMoney.wallet;
 
         if(playerState.isInJail){
             showMessage("You are currently in jail!", 'red');
         }
 
+        tooltipUpdate();
         eduTabLoad();
         rentSectionLoad();
         buySectionLoad();
@@ -250,7 +282,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Job money earned
         if (playerState.jobProfile.currentJob && !playerState.isInJail){
-            playerState.money += playerState.jobProfile.salary;
+            playerState.totalMoney.wallet += playerState.jobProfile.salary;
             if (!playerState.jobs[playerState.jobProfile.currentJob]) {
                 playerState.jobs[playerState.jobProfile.currentJob] = 0;
             }
@@ -263,7 +295,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`Jail period is over`)
             }
         } else {
-            playerState.money -= calcTotalExpense();
+            playerState.totalMoney.wallet -= calcTotalExpense();
         }
 
         // Calculate new age (assuming 365 days in a year)
@@ -280,6 +312,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // Optional: Add logic if remaining days hit zero
         if (playerState.remainingDays <= 0) {
             alert("Game over! Your character's life has ended.");
+        }
+
+        //money goes negative
+        if(calcTotalMoney() <= -1000){
+            alert("You got bankrupted! Start a new game")
+            localStorage.removeItem('lifeSimulatorData');
+            playerState = '';
+            location.reload();
         }
 
         updateUI();
@@ -302,7 +342,7 @@ document.addEventListener('DOMContentLoaded', () => {
             [35, 25, 20, 10, 7, 3], // probabilities
             [1, 2, 5, 10, 20, 50]   // values
         );
-        playerState.money += moneyEarned;
+        playerState.totalMoney.wallet += moneyEarned;
         advanceDay();
         updateUI();
         showMessage(`You earned ₹${moneyEarned} as a beggar!`);
@@ -323,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage("No luck!", "red");
             advanceDay();
         } else {
-            playerState.money += 800;
+            playerState.totalMoney.wallet += 800;
             showMessage(`You successfully stole ₹800!`);
             advanceDay();
         }
@@ -344,7 +384,7 @@ document.addEventListener('DOMContentLoaded', () => {
             [35, 25, 20, 10, 7, 3],
             [1, 2, 5, 10, 20, 50]
         );
-        playerState.money += baseIncome * 5;
+        playerState.totalMoney.wallet += baseIncome * 5;
         advanceDay();
         updateUI();
         showMessage(`You earned ₹${baseIncome * 5} as a delivery guy!`);
@@ -364,7 +404,7 @@ document.addEventListener('DOMContentLoaded', () => {
             [35, 25, 20, 10, 7, 3],
             [1, 2, 5, 10, 20, 50]
         );
-        playerState.money += baseIncome * 7;
+        playerState.totalMoney.wallet += baseIncome * 7;
         advanceDay();
         updateUI();
         showMessage(`You earned ₹${baseIncome * 7} from your art show!`);
@@ -384,7 +424,7 @@ document.addEventListener('DOMContentLoaded', () => {
             [35, 25, 20, 10, 7, 3],
             [1, 2, 5, 10, 20, 50]
         );
-        playerState.money += baseIncome * 10;
+        playerState.totalMoney.wallet += baseIncome * 10;
         advanceDay();
         updateUI();
         showMessage(`You earned ₹${baseIncome * 10} from doing errands!`);
@@ -392,27 +432,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Education tab logic
     document.getElementById('basic-test-button').addEventListener('click', () => {
-        if (playerState.money >= 1500) {
-            playerState.money -= 1500;
+        if (playerState.totalMoney.wallet >= 1500) {
+            playerState.totalMoney.wallet -= 1500;
             playerState.remainingDays += 180; // 6 months
             playerState.education.hasBasicTest = true;
             updateUI();
             alert('You passed the Basic Test!');
         } else {
-            alert('Not enough money to take the Basic Test.');
+            alert('Insufficient amount in wallet.');
         }
     });
 
     document.getElementById('bachelor-degree-button').addEventListener('click', () => {
         if (playerState.education.hasBasicTest) {
-            if(playerState.money >= 40000) {
-                playerState.money -= 40000;
+            if(playerState.totalMoney.wallet >= 40000) {
+                playerState.totalMoney.wallet -= 40000;
                 playerState.remainingDays += 1080; // 36 months
                 playerState.education.hasBachelorDegree = true;
                 updateUI();
                 alert('You earned a Bachelor Degree!');
             } else {
-                alert('Not enough money to get a Bachelor Degree.');
+                alert('Insufficient amount in wallet.');
             }
         } else {
             alert('You need the Basic Test to get a Bachelor Degree.');
@@ -421,14 +461,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('masters-degree-button').addEventListener('click', () => {
         if (playerState.education.hasBachelorDegree) {
-            if(playerState.money >= 60000) {
-                playerState.money -= 60000;
+            if(playerState.totalMoney.wallet >= 60000) {
+                playerState.totalMoney.wallet -= 60000;
                 playerState.remainingDays += 1440; // 48 months
                 playerState.education.hasMastersDegree = true;
                 updateUI();
                 alert('You earned a Master Degree!');
             } else {
-                alert('Not enough money to get a Master Degree.');
+                alert('Insufficient amount in wallet.');
             }
         } else {
             alert('You need the Bachelor Degree to get a Master Degree.');
@@ -437,14 +477,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('phd-button').addEventListener('click', () => {
         if (playerState.education.hasMastersDegree) {
-            if(playerState.money >= 70000) {
-                playerState.money -= 70000;
+            if(playerState.totalMoney.wallet >= 70000) {
+                playerState.totalMoney.wallet -= 70000;
                 playerState.remainingDays += 1800; // 60 months
                 playerState.education.hasPhD = true;
                 updateUI();
                 alert('You earned a PhD!');
             } else {
-                alert('Not enough money to get a PhD.');
+                alert('Insufficient amount in wallet.');
             }
         } else {
             alert('You need the Master Degree to get a PhD.');
@@ -483,7 +523,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             playerState.jobs[id] = 0;
                         }
                     } else {
-                        alert(`You are already working in this job`);
+                        alert(`You are already working in this job.`);
                         return;
                     }
 
@@ -559,7 +599,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Update the state and disable the newly selected button
                         playerState.rent = id;
 
-                        playerState.dailyExpenses.rent = costPerDay;
+                        playerState.dailyExpenses['rent'] = costPerDay;
 
                         if(!playerState.lifestyle.rent.includes(id)){
                             playerState.remainingDays += months * 30;
@@ -570,27 +610,27 @@ document.addEventListener('DOMContentLoaded', () => {
                         alert(`You rented a property. Daily expenses increased by ₹${costPerDay}`);
                     }
                 } else if (type === 'buy') {
-                    if (playerState.money >= cost) {
-                        playerState.money -= cost;
+                    if (playerState.totalMoney.wallet >= cost) {
+                        playerState.totalMoney.wallet -= cost;
                         playerState.remainingDays += months * 30;
                         playerState.lifestyle.buy.push(id);
                         updateUI();
                         alert(`You bought a property. ₹${cost} deducted.`);
                     } else {
-                        alert(`Insufficient funds. Requires ₹${cost}`);
+                        alert(`Insufficient funds in wallet. Requires ₹${cost}`);
                     }
                 }
 
                 // Handle items
                 if (type === 'item') {
-                    if (playerState.money >= cost) {
-                        playerState.money -= cost;
+                    if (playerState.totalMoney.wallet >= cost) {
+                        playerState.totalMoney.wallet -= cost;
                         playerState.remainingDays += months * 30;
                         playerState.lifestyle.items.push(id);
                         updateUI();
                         alert(`You purchased an item. ₹${cost} deducted.`);
                     } else {
-                        alert(`Insufficient funds. Requires ₹${cost}.`);
+                        alert(`Insufficient funds in wallet. Requires ₹${cost}.`);
                     }
                 }
 
@@ -607,7 +647,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Update the state and disable the newly selected button
                         playerState.food = id;
 
-                        playerState.dailyExpenses.food = costPerDay;
+                        playerState.dailyExpenses['food'] = costPerDay;
 
                         if(!playerState.lifestyle.food.includes(id)){
                             playerState.remainingDays += months * 30;
@@ -622,7 +662,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Handle health plans
                 if (type === 'health') {
 
-                    playerState.money -= cost;
+                    playerState.totalMoney.wallet -= cost;
                     playerState.remainingDays += months * 30;
 
                     updateUI();
@@ -632,5 +672,3 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 });
-
-
