@@ -21,13 +21,18 @@ document.addEventListener('DOMContentLoaded', () => {
         bankBalance: 0,
         dailyExpenses: 3,
         isInJail: false,
-        activeJob: null,
         education: {
             hasBasicTest: false,
             hasBachelorDegree: false,
             hasMastersDegree: false,
             hasPhD: false
         },
+        jobProfile: {
+            activeJob: false,
+            currentJob: null,
+            salary: 0
+        },
+        jobs: {},
     };
 
     const loadGame = () => {
@@ -127,6 +132,10 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('bank-balance').textContent = playerState.bankBalance;
         document.getElementById('daily-expenses').textContent = playerState.dailyExpenses;
 
+        if(playerState.isInJail){
+            showMessage("You are currently in jail!", 'red');
+        }
+
         eduTabLoad();
         saveGame();
     };
@@ -182,7 +191,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const advanceDay = () => {
         playerState.remainingDays -= 1; // Decrease remaining days
-        playerState.daysAdvanced += 1;         // Increment the total days advanced
+        playerState.daysAdvanced += 1;  // Increment the total days advanced
+
+        // Job money earned
+        if (playerState.jobProfile.currentJob && !playerState.isInJail){
+            playerState.money += playerState.jobProfile.salary;
+            if (!playerState.jobs[playerState.jobProfile.currentJob]) {
+                playerState.jobs[playerState.jobProfile.currentJob] = 0;
+            }
+            playerState.jobs[playerState.jobProfile.currentJob] += 1;
+        }
 
         if (playerState.isInJail) {
             if (--playerState.jailDays <= 0) {
@@ -208,6 +226,7 @@ document.addEventListener('DOMContentLoaded', () => {
         if (playerState.remainingDays <= 0) {
             alert("Game over! Your character's life has ended.");
         }
+
         updateUI();
     };
 
@@ -215,6 +234,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('skip-day').addEventListener('click', () => {
         advanceDay();
         updateUI();
+        showMessage(`Day skipped!`);
     });
 
     document.getElementById('beggar-button').addEventListener('click', () => {
@@ -376,7 +396,73 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Career tab and Lifestyle tab logic can be implemented similarly...
+    // Career Tab Logic
+    const careerOptions = {
+        'dev-l1-button': { income: 800, requirement: 'Bachelor Degree' },
+        'teacher-primary-button': { income: 700, requirement: 'Bachelor Degree' },
+        'dev-l2-button': { income: 1500, requirement: 'Software Developer L1 for 12 months' },
+        'teacher-secondary-button': { income: 1400, requirement: 'Primary Teacher for 6 months' },
+        'professor-button': { income: 4000, requirement: 'Secondary Teacher for 18 months and PhD' },
+        'specialist-dev-button': { income: 2000, requirement: 'Software Developer L2 for 24 months' },
+        'team-lead-button': { income: 3500, requirement: 'Specialist Developer for 36 months' },
+        'manager-button': { income: 5000, requirement: 'Team Lead for 36 months and Masters Degree' },
+        'entrepreneur-button': { income: 8000, requirement: 'Manager or Professor for 48 months' },
+        'super-entrepreneur-button': { income: 12000, requirement: 'Entrepreneur for 48 months' },
+        'investor-button': { income: 20000, requirement: 'Super Entrepreneur for 48 months' }
+    };
+
+    document.querySelectorAll('#career-tab .action-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.id;
+            if (careerOptions[id]) {
+                const { income, requirement } = careerOptions[id];
+
+                // Example logic to validate requirements
+                if (checkCareerRequirements(id)) {
+
+                    if (playerState.jobProfile.currentJob !== id) {
+                        playerState.jobProfile.currentJob = id;
+
+                        // Initialize days spent for this job if it doesn't exist
+                        if (!playerState.jobs[id]) {
+                            playerState.jobs[id] = 0;
+                        }
+                    } else {
+                        alert(`You are already working in this job`);
+                        return;
+                    }
+
+                    playerState.jobProfile.activeJob = true;
+                    playerState.jobProfile.salary = income;
+                    updateUI();
+                    alert(`You have switched to a new career. Earning ₹${income}/day.`);
+                } else {
+                    alert(`Requirement not met: ${requirement}`, 'error');
+                }
+            }
+        });
+    });
+
+    // Helper to validate career requirements (replace with your actual logic)
+    function checkCareerRequirements(id) {
+        switch(id){
+            case 'dev-l1-button': return playerState.education.hasBachelorDegree;
+            case 'teacher-primary-button': return playerState.education.hasBachelorDegree;
+            case 'dev-l2-button': return playerState.jobs['dev-l1-button']/30 >= 12;
+            case 'teacher-secondary-button': return playerState.jobs['teacher-primary-button']/30 >= 6;
+            case 'professor-button': return playerState.jobs['teacher-secondary-button']/30 >= 18 && playerState.education.hasPhD;
+            case 'specialist-dev-button': return playerState.jobs['dev-l2-button']/30 >= 24;
+            case 'team-lead-button': return playerState.jobs['specialist-dev-button']/30 >= 36;
+            case 'manager-button': return playerState.jobs['team-lead-button']/30 >= 36 && playerState.education.hasMastersDegree;
+            case 'entrepreneur-button': return playerState.jobs['manager-button']/30 >= 48 || playerState.jobs['professor-button']/30 >= 48;
+            case 'super-entrepreneur-button': return playerState.jobs['entrepreneur-button']/30 >= 48;
+            case 'investor-button': return playerState.jobs['super-entrepreneur-button']/30 >= 48;
+        }
+
+    }
+
+
+    // and Lifestyle tab logic can be implemented similarly...
 });
 
 
