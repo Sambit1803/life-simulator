@@ -19,7 +19,10 @@ document.addEventListener('DOMContentLoaded', () => {
         remainingDays: 540, // 1.5 years in days
         money: 0,
         bankBalance: 0,
-        dailyExpenses: 3,
+        dailyExpenses: {
+            food: 3,
+            rent: 0
+        },
         isInJail: false,
         education: {
             hasBasicTest: false,
@@ -33,6 +36,14 @@ document.addEventListener('DOMContentLoaded', () => {
             salary: 0
         },
         jobs: {},
+        lifestyle: {
+            rent: [],
+            buy: [],
+            items: [],
+            food: []
+        },
+        rent: null,
+        food: null
     };
 
     const loadGame = () => {
@@ -123,6 +134,46 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const calcTotalExpense = () => {
+        return Object.values(playerState.dailyExpenses).reduce((sum, expense) => sum + expense, 0);
+    };
+
+    const rentSectionLoad = () => {
+        const btn = document.getElementById(playerState.rent);
+        if(btn){
+            btn.style.display = 'none';
+            btn.parentElement.style.color = "green";
+        }
+    };
+
+    const buySectionLoad = () => {
+        playerState.lifestyle.buy.forEach((id) => {
+            const btn = document.getElementById(id);
+            if(btn){
+                btn.style.display = 'none';
+                btn.parentElement.style.color = "green";
+            }
+        });
+    };
+
+    const itemsSectionLoad = () => {
+        playerState.lifestyle.items.forEach((id) => {
+            const btn = document.getElementById(id);
+            if(btn){
+                btn.style.display = 'none';
+                btn.parentElement.style.color = "green";
+            }
+        });
+    };
+
+    const foodSectionLoad = () => {
+        const btn = document.getElementById(playerState.food);
+        if(btn){
+            btn.style.display = 'none';
+            btn.parentElement.style.color = "green";
+        }
+    };
+
     // Utility functions
     const updateUI = () => {
         document.getElementById('age').textContent = playerState.age;
@@ -130,13 +181,17 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('remaining-days').textContent = playerState.remainingDays;
         document.getElementById('money').textContent = playerState.money;
         document.getElementById('bank-balance').textContent = playerState.bankBalance;
-        document.getElementById('daily-expenses').textContent = playerState.dailyExpenses;
+        document.getElementById('daily-expenses').textContent = calcTotalExpense();
 
         if(playerState.isInJail){
             showMessage("You are currently in jail!", 'red');
         }
 
         eduTabLoad();
+        rentSectionLoad();
+        buySectionLoad();
+        itemsSectionLoad();
+        foodSectionLoad();
         saveGame();
     };
 
@@ -208,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 alert(`Jail period is over`)
             }
         } else {
-            playerState.money -= playerState.dailyExpenses;
+            playerState.money -= calcTotalExpense();
         }
 
         // Calculate new age (assuming 365 days in a year)
@@ -280,7 +335,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`You are in jail. You have to skip ${playerState.jailDays} days`);
             return;
         }
-        if (!playerState.hasBicycle) {
+        if (!playerState.lifestyle.items.includes('bicycle-button')) {
             alert(`You need to purchase Bicycle from lifestyle tab`);
             return;
         }
@@ -300,7 +355,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`You are in jail. You have to skip ${playerState.jailDays} days`);
             return;
         }
-        if (!playerState.hasInstrument) {
+        if (!playerState.lifestyle.items.includes('instrument-button')) {
             alert(`You need to purchase instrument from lifestyle tab`);
             return;
         }
@@ -320,7 +375,7 @@ document.addEventListener('DOMContentLoaded', () => {
             alert(`You are in jail. You have to skip ${playerState.jailDays} days`);
             return;
         }
-        if (!playerState.hasBike) {
+        if (!playerState.lifestyle.items.includes('bike-button')) {
             alert(`You need to purchase Bike from lifestyle tab`);
             return;
         }
@@ -437,7 +492,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     updateUI();
                     alert(`You have switched to a new career. Earning ₹${income}/day.`);
                 } else {
-                    alert(`Requirement not met: ${requirement}`, 'error');
+                    alert(`Requirement not met: ${requirement}`);
                 }
             }
         });
@@ -461,8 +516,121 @@ document.addEventListener('DOMContentLoaded', () => {
 
     }
 
+    // Lifestyle Tab Logic
+    const lifestyleOptions = {
+        // Rent Options
+        'pg-button': { months: 3, costPerDay: 100, type: 'rent' },
+        'rent-2bhk-button': { months: 6, costPerDay: 150, type: 'rent' },
+        'rent-3bhk-button': { months: 12, costPerDay: 250, type: 'rent' },
+        // Buy Options
+        'buy-2bhk-button': { months: 24, cost: 10000, type: 'buy' },
+        'buy-3bhk-button': { months: 36, cost: 20000, type: 'buy' },
+        'buy-duplex-button': { months: 48, cost: 40000, type: 'buy' },
+        'buy-bungalow-button': { months: 60, cost: 80000, type: 'buy' },
+        // Items
+        'bicycle-button': { months: 1, cost: 200, type: 'item' },
+        'instrument-button': { months: 2, cost: 300, type: 'item' },
+        'bike-button': { months: 3, cost: 600, type: 'item' },
+        // Food
+        'food-basic-button': { months: 3, costPerDay: 5, type: 'food' },
+        'food-balanced-button': { months: 6, costPerDay: 25, type: 'food' },
+        'food-diet-button': { months: 12, costPerDay: 50, type: 'food' },
+        // Health
+        'checkup-basic-button': { months: 1, cost: 100, type: 'health' },
+        'checkup-full-body-button': { months: 3, cost: 250, type: 'health' }
+    };
 
-    // and Lifestyle tab logic can be implemented similarly...
+    document.querySelectorAll('#lifestyle-tab .action-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const id = button.id;
+            if (lifestyleOptions[id]) {
+                const { months, cost, costPerDay, type } = lifestyleOptions[id];
+
+                // Handle rent and buy options
+                if (type === 'rent') {
+                    if (playerState.rent !== id) {
+                        // Enable the previously selected button, if any
+                        if (playerState.rent) {
+                            const btn = document.getElementById(playerState.rent);
+                            btn.style.display = 'block';
+                            btn.parentElement.style.color = "";
+                        }
+
+                        // Update the state and disable the newly selected button
+                        playerState.rent = id;
+
+                        playerState.dailyExpenses.rent = costPerDay;
+
+                        if(!playerState.lifestyle.rent.includes(id)){
+                            playerState.remainingDays += months * 30;
+                            playerState.lifestyle.rent.push(id);
+                        }
+
+                        updateUI();
+                        alert(`You rented a property. Daily expenses increased by ₹${costPerDay}`);
+                    }
+                } else if (type === 'buy') {
+                    if (playerState.money >= cost) {
+                        playerState.money -= cost;
+                        playerState.remainingDays += months * 30;
+                        playerState.lifestyle.buy.push(id);
+                        updateUI();
+                        alert(`You bought a property. ₹${cost} deducted.`);
+                    } else {
+                        alert(`Insufficient funds. Requires ₹${cost}`);
+                    }
+                }
+
+                // Handle items
+                if (type === 'item') {
+                    if (playerState.money >= cost) {
+                        playerState.money -= cost;
+                        playerState.remainingDays += months * 30;
+                        playerState.lifestyle.items.push(id);
+                        updateUI();
+                        alert(`You purchased an item. ₹${cost} deducted.`);
+                    } else {
+                        alert(`Insufficient funds. Requires ₹${cost}.`);
+                    }
+                }
+
+                // Handle food options
+                if (type === 'food') {
+                    if (playerState.food !== id) {
+                        // Enable the previously selected button, if any
+                        if (playerState.food) {
+                            const btn = document.getElementById(playerState.food);
+                            btn.style.display = 'block';
+                            btn.parentElement.style.color = "";
+                        }
+
+                        // Update the state and disable the newly selected button
+                        playerState.food = id;
+
+                        playerState.dailyExpenses.food = costPerDay;
+
+                        if(!playerState.lifestyle.food.includes(id)){
+                            playerState.remainingDays += months * 30;
+                            playerState.lifestyle.food.push(id);
+                        }
+
+                        updateUI();
+                        alert(`You switched to a new food plan. Daily expenses increased by ₹${costPerDay}.`);
+                    }
+                }
+
+                // Handle health plans
+                if (type === 'health') {
+
+                    playerState.money -= cost;
+                    playerState.remainingDays += months * 30;
+
+                    updateUI();
+                    alert(`You took a health check-up which costed ₹${cost}.`);
+                }
+            }
+        });
+    });
 });
 
 
