@@ -96,3 +96,70 @@ button {
 #skip-day:hover {
     background-color: #0056b3;
 }
+
+h1, .header {
+  position: sticky;
+  top: 0;
+  background-color: #ffffff; /* Add background color to prevent content overlap */
+  padding: 10px 20px; /* Add some padding for styling */
+  border-bottom: 2px solid #ccc; /* Optional: Add a bottom border for a clean look */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.header {
+  top: 8vh;
+}
+
+/* Tooltip container */
+.tooltip {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+    color: #007bff;
+    text-decoration: underline;
+}
+
+/* Tooltip text */
+.tooltip .tooltip-text {
+    visibility: hidden;
+    width: 150px;
+    background-color: #333;
+    color: #fff;
+    text-align: center;
+    border-radius: 5px;
+    padding: 5px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%; /* Position above the tooltip trigger */
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0; /* Start hidden */
+    transition: opacity 0.3s;
+    font-size: 12px;
+}
+
+/* Arrow at the bottom of the tooltip */
+.tooltip .tooltip-text::after {
+    content: '';
+    position: absolute;
+    top: 100%; /* At the bottom of the tooltip */
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 5px;
+    border-style: solid;
+    border-color: #333 transparent transparent transparent;
+}
+
+/* Show the tooltip on hover */
+.tooltip:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+}
+
+#tooltip-expenses {
+    text-transform: capitalize;
+}
+
+#tooltip-money {
+    text-transform: capitalize;
+}

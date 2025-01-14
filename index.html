@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Life Simulator Game</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 <body>
 <div id="app">
@@ -15,14 +16,29 @@
     </div>
 
     <div id="game-screen" style="display: none;">
-        <header>
+        <header class="header">
                 <div>
-                    <p>Age: <span id="age">18</span></p>
-                    <p>Days Advanced: <span id="days-advanced">0</span></p>
-                    <p>Remaining Days: <span id="remaining-days">547</span></p>
-                    <p>Money in Hand: ₹<span id="money">0</span></p>
-                    <p>Bank Balance: ₹<span id="bank-balance">0</span></p>
-                    <p>Daily Expenses: ₹<span id="daily-expenses">3</span> <span id="info-expenses">(Food only)</span></p>
+                    <p>Age: <span id="age">18</span><span> years </span>
+                        <span id="days-advanced">0</span><span> days </span>
+                        <span id="info-age" class="tooltip"><i class="fa fa-info-circle"></i>
+                            <span class="tooltip-text" id="tooltip-age">
+                                Remaining: <span id="remaining-days">540</span> days
+                            </span>
+                        </span>
+                    </p>
+                    <p>Wallet: ₹<span id="wallet">0</span></p>
+                    <p>Total Money: ₹<span id="total-money">0</span>
+                        <span id="info-money" class="tooltip"><i class="fa fa-info-circle"></i>
+                            <span class="tooltip-text" id="tooltip-money">
+                            </span>
+                        </span>
+                    </p>
+                    <p>Daily Expenses: ₹<span id="daily-expenses">3</span>
+                        <span id="info-expenses" class="tooltip"><i class="fa fa-info-circle"></i>
+                            <span class="tooltip-text" id="tooltip-expenses">
+                            </span>
+                        </span>
+                    </p>
                     <div id="action-message" style="color: green; visibility: hidden">action-message</div>
                 </div>
                 <div id="menu-panel">
