@@ -24,21 +24,26 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    flex-wrap: wrap;
 }
 
 nav {
     display: flex;
-    justify-content: space-around;
+    justify-content: space-between;
     margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
 button {
     background-color: #007bff;
     color: white;
     border: none;
-    padding: 10px 20px;
+    padding: 10px 10px;
     border-radius: 5px;
     cursor: pointer;
+    margin: 2px;
+    width: 100px;
+    flex: 1 0 20%;
 }
 
 #start-screen {
@@ -81,16 +86,6 @@ button {
 
 #home-tab h2 {
     margin: 0; /* Remove any default margin */
-}
-
-#skip-day {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
 }
 
 #skip-day:hover {
