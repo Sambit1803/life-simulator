@@ -97,17 +97,22 @@ button {
     background-color: #0056b3;
 }
 
-h1, .header {
+h1, .header, nav {
   position: sticky;
   top: 0;
   background-color: #ffffff; /* Add background color to prevent content overlap */
   padding: 10px 20px; /* Add some padding for styling */
   border-bottom: 2px solid #ccc; /* Optional: Add a bottom border for a clean look */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
 }
 
 .header {
-  top: 8vh;
+  top: 59px;
+}
+
+nav {
+  top: 253.5px;
 }
 
 /* Tooltip container */
