@@ -129,6 +129,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const careerTabLoad = () => {
+        const btn = document.getElementById(playerState.jobProfile.currentJob);
+        if (btn) {
+            btn.style.display = 'none';
+            btn.parentElement.style.color = "green";
+        }
+    };
+
+    const workExLoad = () => {
+        for(let key in playerState.jobs){
+            const btn = document.getElementById(key);
+            const parent = btn.parentElement;
+
+            const second_child = parent.children[1];
+            const child = document.getElementById(`info-work-ex-${key}`);
+
+            if(!child){
+                const node = document.createElement("span");
+                node.id = `info-work-ex-${key}`;
+                node.className = 'tooltip';
+                node.innerHTML = `<i class="fa fa-info-circle"></i>`;
+                parent.insertBefore(node, second_child);
+                node.style.color = "#007bff";
+
+                const newNode = document.createElement("span");
+                newNode.id = `tooltip-${key}`;
+                newNode.className = 'tooltip-text';
+                newNode.innerHTML = `Work Exp (in months): ${parseInt(playerState.jobs[key]/30)}`;
+                node.appendChild(newNode);
+            } else {
+                child.lastChild.innerHTML = `Work Exp (in months): ${parseInt(playerState.jobs[key]/30)}`;
+            }
+        }
+    };
+
     const calcTotalExpense = () => {
         return Object.values(playerState.dailyExpenses).reduce((sum, expense) => sum + expense, 0);
     };
@@ -205,11 +240,36 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    const remainingDaysLogic = () => {
+        const days_adv = playerState.daysAdvanced;
+        const days_rem = playerState.remainingDays;
+        const total_days = days_adv + days_rem;
+
+        const yrs = parseInt(total_days / 365);
+        const days = total_days % 365;
+        const total_yrs = yrs + playerState.age;
+
+        const tooltipContainer = document.getElementById('tooltip-age');
+        tooltipContainer.innerHTML = '';
+
+        const node1 = document.createElement("span");
+        const text1 = document.createTextNode("Life Expectancy:");
+        node1.appendChild(text1);
+        tooltipContainer.appendChild(node1);
+
+        const lineBreak = document.createElement("br");
+        tooltipContainer.appendChild(lineBreak);
+
+        const node2 = document.createElement("span");
+        const text2 = document.createTextNode(total_yrs+" years "+days+" days");
+        node2.appendChild(text2);
+        tooltipContainer.appendChild(node2);
+    };
+
     // Utility functions
     const updateUI = () => {
         document.getElementById('age').textContent = playerState.age;
         document.getElementById('days-advanced').textContent = playerState.daysAdvanced;
-        document.getElementById('remaining-days').textContent = playerState.remainingDays;
         document.getElementById('total-money').textContent = calcTotalMoney();
         document.getElementById('daily-expenses').textContent = calcTotalExpense();
         document.getElementById('wallet').textContent = playerState.totalMoney.wallet;
@@ -218,8 +278,11 @@ document.addEventListener('DOMContentLoaded', () => {
             showMessage("You are currently in jail!", 'red');
         }
 
+        remainingDaysLogic();
         tooltipUpdate();
         eduTabLoad();
+        careerTabLoad();
+        workExLoad();
         rentSectionLoad();
         buySectionLoad();
         itemsSectionLoad();
@@ -304,19 +367,22 @@ document.addEventListener('DOMContentLoaded', () => {
             playerState.daysAdvanced = 0;
         }
 
-        // Optional: Warning msg
-        if (playerState.remainingDays <= 60 && playerState.remainingDays % 10 === 0) {
-            alert("Warning! You only have ${playerState.remainingDays} days. Add more months.");
-        }
-
-        // Optional: Add logic if remaining days hit zero
+        // logic if remaining days hit zero
         if (playerState.remainingDays <= 0) {
             alert("Game over! Your character's life has ended.");
+            localStorage.removeItem('lifeSimulatorData');
+            playerState = '';
+            location.reload();
+        }
+
+        // warning msg for remaining days
+        if (playerState.remainingDays <= 60 && playerState.remainingDays % 10 === 0) {
+            alert(`Warning! You only have ${playerState.remainingDays} days. Add more months.`);
         }
 
         //money goes negative
         if(calcTotalMoney() <= -1000){
-            alert("You got bankrupted! Start a new game")
+            alert("You got bankrupted! Start a new game");
             localStorage.removeItem('lifeSimulatorData');
             playerState = '';
             location.reload();
@@ -514,19 +580,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Example logic to validate requirements
                 if (checkCareerRequirements(id)) {
-
-                    if (playerState.jobProfile.currentJob !== id) {
-                        playerState.jobProfile.currentJob = id;
-
-                        // Initialize days spent for this job if it doesn't exist
-                        if (!playerState.jobs[id]) {
-                            playerState.jobs[id] = 0;
-                        }
-                    } else {
-                        alert(`You are already working in this job.`);
-                        return;
+                    // Enable the previously selected button, if any
+                    if (playerState.jobProfile.currentJob) {
+                        const btn = document.getElementById(playerState.jobProfile.currentJob);
+                        btn.style.display = 'block';
+                        btn.parentElement.style.color = "";
                     }
 
+                    playerState.jobProfile.currentJob = id;
+
+                    // Initialize days spent for this job if it doesn't exist
+                    if (!playerState.jobs[id]) {
+                        playerState.jobs[id] = 0;
+                    }
                     playerState.jobProfile.activeJob = true;
                     playerState.jobProfile.salary = income;
                     updateUI();
